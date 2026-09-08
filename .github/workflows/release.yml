@@ -1,0 +1,38 @@
+# Erzeugt zu jedem gepushten Tag ein GitHub-Release.
+#
+# Hintergrund: HACS ermittelt die Version eines Custom Repositories aus den
+# GitHub-Releases, nicht aus `manifest.json` und nicht aus Git-Tags. Ohne
+# Release verfolgt HACS nur den Standardbranch und zeigt keinen
+# Versionssprung an. Diese Action schliesst die Lücke, damit ein Tag-Push
+# genügt.
+#
+# Sie verwendet ausschliesslich das automatisch bereitgestellte Token des
+# Runners (`github.token`) und die auf dem Runner vorinstallierte GitHub-CLI.
+# Es wird kein eigenes Geheimnis benötigt und keine fremde Action eingebunden.
+name: Release
+
+on:
+  push:
+    tags:
+      - "*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release aus Tag erstellen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Release anlegen, falls noch keines existiert
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME existiert bereits, nichts zu tun."
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --title "$GITHUB_REF_NAME" \
+              --generate-notes
+          fi
