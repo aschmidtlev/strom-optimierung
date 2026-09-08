@@ -42,6 +42,36 @@ Danach:
 Soll das Repository privat bleiben, ist die manuelle Installation nach
 Abschnitt 3 der Weg – sie kommt ohne HACS aus.
 
+### 2.1 Neue Versionen sichtbar machen
+
+HACS ermittelt die Version eines Custom Repositories über die
+**GitHub-Releases**, nicht über `manifest.json` und nicht über Git-Tags. Eine
+angehobene Versionsnummer im Manifest allein führt deshalb zu keinem
+Update-Hinweis, und ein `git tag` allein ebenfalls nicht: GitHub erzeugt aus
+einem Tag kein Release.
+
+Gegenprüfen lässt sich das so:
+
+```bash
+curl -s https://api.github.com/repos/aschmidtlev/strom-optimierung/releases
+```
+
+Kommt `[]` zurück, existiert kein Release – dann verfolgt HACS den
+Standardbranch und zeigt keine Versionssprünge an.
+
+**Release anlegen:** auf GitHub unter **Releases → Draft a new release** den
+bereits vorhandenen Tag auswählen, als Titel die Versionsnummer eintragen und
+veröffentlichen. Danach in HACS beim Repository über das Dreipunktmenü
+**Informationen aktualisieren** wählen; anschliessend erscheint das Update.
+
+**Ohne Release**, also solange HACS den Standardbranch verfolgt: im
+Dreipunktmenü **Neu herunterladen** wählen und den Branch `main` bestätigen.
+Das holt den aktuellen Stand, zeigt aber weiterhin keine Versionsnummer.
+
+Bei jeder neuen Version gehören damit drei Schritte zusammen: Version in
+`custom_components/strom_optimierung/manifest.json` anheben, Tag mit
+derselben Nummer pushen, Release aus diesem Tag veröffentlichen.
+
 ## 3. Manuelle Installation
 
 Den Ordner `custom_components/strom_optimierung` in das
