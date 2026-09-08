@@ -129,7 +129,7 @@ an der Integration ändern.
    `unavailable`.
 2. Das Attribut `erlaeuterung` desselben Sensors lesen: es beschreibt in
    Klartext, warum genau diese Empfehlung gilt.
-3. `binary_sensor.strom_optimierung_datenbasis_unvollstaendig` prüfen. Steht
+3. `binary_sensor.strom_optimierung_datenbasis_unvollstandig` prüfen. Steht
    er auf *an*, nennt sein Attribut `fehlende_daten`, welche Eingangswerte
    fehlen. Solange der Marstek ausgefallen ist, wird dort „Speicher-SoC"
    stehen – das ist erwartet.

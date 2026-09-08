@@ -56,6 +56,33 @@ in auskommentierten Zeilen sowie – im Fall des Ladestands – innerhalb eines
 Ebenfalls geprüft: die Struktur des Dashboards (4 Ansichten, 24 Karten, keine
 Tabulatoren, keine doppelten Kartentitel, keine leeren Blockskalare).
 
+### 1.2c Gegenprüfung gegen die laufende Instanz
+
+Mit `csv/harvest_2026-09-08-23-22-51.csv` lag erstmals ein **Vollexport**
+(9076 Entities) einer Instanz vor, auf der die Integration bereits lief.
+Alle 83 Dashboard-Referenzen wurden dagegen erneut geprüft: **83 von 83
+lösen auf, keine unauflösbar.**
+
+Dabei fielen vier falsche Entity-IDs auf. Sie waren aus den Schlüsseln im
+Code abgeleitet statt verifiziert – Home Assistant bildet die entity_id
+jedoch aus dem angezeigten Namen und transliteriert Umlaute. Die Zuordnung
+Schlüssel zu tatsächlicher ID steht jetzt vollständig in
+`strom_v1_entity_mapping.md`.
+
+Der Vollexport belegt zugleich, dass die Entscheidungslogik arbeitet:
+
+| Entity | Wert | Bewertung |
+|---|---|---|
+| `sensor.strom_optimierung_empfehlung` | idle | nachts ohne PV und ohne günstiges Fenster erwartet |
+| `sensor.strom_optimierung_netzleistung` | 498 W | Phasensumme des Shelly Pro 3EM wird gebildet |
+| `sensor.strom_optimierung_erwarteter_grossverbrauch` | 3.1 kWh | die von `ww_v3` angekündigte Warmwasserladung wird erkannt |
+| `sensor.strom_optimierung_ziel_ladestand` | 70.5 % | deckt genau den Bedarf von 3.1 kWh über dem Mindest-Ladestand – derselbe Wert, den `test_pv_reserve_never_undercuts_announced_load` erwartet |
+| `binary_sensor.strom_optimierung_datenbasis_unvollstandig` | on | korrekt, solange der Speicher-Ladestand fehlt |
+
+Der Ziel-Ladestand von 70.5 % ist die bislang stärkste Bestätigung: er
+stimmt auf die Nachkommastelle mit dem Testfall überein, der ohne laufende
+Instanz geschrieben wurde.
+
 ### 1.3 Eindeutigkeit von IDs
 
 | Prüfung | Ergebnis |

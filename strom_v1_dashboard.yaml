@@ -30,7 +30,7 @@ views:
     badges:
       - entity: binary_sensor.strom_optimierung_laden_empfohlen
         name: Laden empfohlen
-      - entity: binary_sensor.strom_optimierung_guenstiges_fenster_aktiv
+      - entity: binary_sensor.strom_optimierung_gunstiges_fenster_aktiv
         name: Guenstiges Fenster
       - entity: binary_sensor.marstek_venus_modbus_modbus_verbindung
         name: Speicher-Modbus
@@ -110,7 +110,7 @@ views:
             name: Hausverbrauch
           - entity: sensor.tibber_pulse_home_energie
             name: Tibber Pulse Leistung
-          - entity: sensor.strom_optimierung_pv_ueberschuss
+          - entity: sensor.strom_optimierung_pv_uberschuss
             name: Erkannter PV-Ueberschuss
 
       - type: markdown
@@ -130,7 +130,7 @@ views:
           `binary_sensor.marstek_venus_modbus_modbus_verbindung` steht auf
           `{{ verbindung }}`. Der Speicher fehlt deshalb im Stromfluss oben,
           und die Empfehlung arbeitet ohne Ladestand - sichtbar an
-          `binary_sensor.strom_optimierung_datenbasis_unvollstaendig`.
+          `binary_sensor.strom_optimierung_datenbasis_unvollstandig`.
 
           Die Entscheidungslogik laeuft trotzdem: sie sagt weiterhin, wann
           geladen werden sollte, nur ohne zu wissen, wie voll der Speicher
@@ -175,7 +175,7 @@ views:
     badges:
       - entity: sensor.strom_optimierung_empfehlung
         name: Empfehlung
-      - entity: sensor.strom_optimierung_ziel_soc
+      - entity: sensor.strom_optimierung_ziel_ladestand
         name: Ziel-SoC
       - entity: sensor.strom_optimierung_entscheidungsquelle
         name: Quelle
@@ -231,7 +231,7 @@ views:
         entities:
           - entity: sensor.strom_optimierung_empfehlung
             name: Aktion
-          - entity: sensor.strom_optimierung_ziel_soc
+          - entity: sensor.strom_optimierung_ziel_ladestand
             name: Ziel-Ladestand
           - entity: sensor.strom_optimierung_empfohlene_ladeleistung
             name: Empfohlene Ladeleistung
@@ -252,7 +252,7 @@ views:
 
       - type: gauge
         title: Ziel-Ladestand
-        entity: sensor.strom_optimierung_ziel_soc
+        entity: sensor.strom_optimierung_ziel_ladestand
         min: 0
         max: 100
         needle: true
@@ -281,9 +281,9 @@ views:
         entities:
           - entity: sensor.strom_optimierung_empfehlung
             name: Empfehlung
-          - entity: sensor.strom_optimierung_ziel_soc
+          - entity: sensor.strom_optimierung_ziel_ladestand
             name: Ziel-Ladestand
-          - entity: binary_sensor.strom_optimierung_guenstiges_fenster_aktiv
+          - entity: binary_sensor.strom_optimierung_gunstiges_fenster_aktiv
             name: Guenstiges Fenster
 
       - type: logbook
@@ -478,7 +478,7 @@ views:
     icon: mdi:stethoscope
     type: masonry
     badges:
-      - entity: binary_sensor.strom_optimierung_datenbasis_unvollstaendig
+      - entity: binary_sensor.strom_optimierung_datenbasis_unvollstandig
         name: Daten unvollstaendig
       - entity: binary_sensor.home_tibber_api_verbindung
         name: Tibber
@@ -490,7 +490,7 @@ views:
       - type: markdown
         title: Datenbasis
         content: >-
-          {% set fehlend = state_attr('binary_sensor.strom_optimierung_datenbasis_unvollstaendig','fehlende_daten') %}
+          {% set fehlend = state_attr('binary_sensor.strom_optimierung_datenbasis_unvollstandig','fehlende_daten') %}
           {% if fehlend %}
           Diese Eingangswerte fehlen der Entscheidungslogik:
 

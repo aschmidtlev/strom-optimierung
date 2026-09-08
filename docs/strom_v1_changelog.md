@@ -29,6 +29,18 @@ Fehlerkorrektur nach der ersten Installation auf der Zielanlage.
   an, mit dem eingebauten Runner-Token und der dort vorinstallierten
   GitHub-CLI – ohne eigenes Geheimnis und ohne fremde Action. Damit kann ein
   Release nicht mehr vergessen werden.
+- **Vier Entity-IDs im Dashboard und in der Dokumentation waren falsch.** Sie
+  waren aus den Schlüsseln im Code abgeleitet worden. Home Assistant bildet
+  die entity_id aber aus dem *angezeigten Namen* und transliteriert dabei
+  Umlaute (`ü` zu `u`, `ä` zu `a`). Korrigiert: `ziel_soc` zu
+  `ziel_ladestand`, `pv_ueberschuss` zu `pv_uberschuss`,
+  `guenstiges_fenster_aktiv` zu `gunstiges_fenster_aktiv`,
+  `datenbasis_unvollstaendig` zu `datenbasis_unvollstandig`. Der
+  Integrationscode ist davon nicht betroffen – nur `strom_v1_dashboard.yaml`,
+  `README.md` und zwei Dokumente.
+- `strom_v1_entity_mapping.md` führt die eigenen Entities jetzt mit ihrer
+  tatsächlichen entity_id, verifiziert gegen einen Vollexport der laufenden
+  Instanz.
 
 ## 0.1.0 – 09.09.2026
 

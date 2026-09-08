@@ -95,6 +95,48 @@ geführt und **nicht** automatisiert.
 |---|---|---|---|
 | `ai_task.claude_ai_task` | unknown (Entity vorhanden) | optional – Verfeinerung der Entscheidung | `harvest_2026-09-08-21-58-56.csv:2` |
 
+## Eigene Entities der Integration
+
+Verifiziert gegen `csv/harvest_2026-09-08-23-22-51.csv` (Vollexport der
+laufenden Instanz, 9076 Entities, 09.09.2026 01:22 Uhr) – die erste Prüfung
+gegen eine Instanz, auf der die Integration tatsächlich lief.
+
+| Schlüssel im Code | Angezeigter Name | Tatsächliche entity_id | Wert im Snapshot |
+|---|---|---|---|
+| `empfehlung` | Empfehlung | `sensor.strom_optimierung_empfehlung` | idle |
+| `ziel_soc` | Ziel-Ladestand | `sensor.strom_optimierung_ziel_ladestand` | 70.5 % |
+| `empfohlene_ladeleistung` | Empfohlene Ladeleistung | `sensor.strom_optimierung_empfohlene_ladeleistung` | 0 W |
+| `netzleistung` | Netzleistung | `sensor.strom_optimierung_netzleistung` | 498 W |
+| `pv_ueberschuss` | PV-Überschuss | `sensor.strom_optimierung_pv_uberschuss` | 0 W |
+| `erwarteter_grossverbrauch` | Erwarteter Großverbrauch | `sensor.strom_optimierung_erwarteter_grossverbrauch` | 3.1 kWh |
+| `erwartete_ersparnis` | Erwartete Ersparnis | `sensor.strom_optimierung_erwartete_ersparnis` | unknown |
+| `ladefenster_start` | Ladefenster Start | `sensor.strom_optimierung_ladefenster_start` | unknown |
+| `ladefenster_ende` | Ladefenster Ende | `sensor.strom_optimierung_ladefenster_ende` | unknown |
+| `entscheidungsquelle` | Entscheidungsquelle | `sensor.strom_optimierung_entscheidungsquelle` | rule |
+| `laden_empfohlen` | Laden empfohlen | `binary_sensor.strom_optimierung_laden_empfohlen` | off |
+| `guenstiges_fenster_aktiv` | Günstiges Fenster aktiv | `binary_sensor.strom_optimierung_gunstiges_fenster_aktiv` | off |
+| `datenbasis_unvollstaendig` | Datenbasis unvollständig | `binary_sensor.strom_optimierung_datenbasis_unvollstandig` | on |
+
+**Die entity_id folgt dem angezeigten Namen, nicht dem Schlüssel im Code.**
+Home Assistant bildet sie aus Gerätename plus Entity-Name und transliteriert
+dabei Umlaute: `ü` wird zu `u`, `ä` zu `a`, `ß` zu `ss`. Auf dieser Instanz
+gilt der deutsche Name.
+
+Daraus folgen vier Abweichungen, die man nicht erraten kann:
+
+| Aus dem Schlüssel abgeleitet (falsch) | Tatsächlich |
+|---|---|
+| `..._ziel_soc` | `..._ziel_ladestand` |
+| `..._pv_ueberschuss` | `..._pv_uberschuss` |
+| `..._guenstiges_fenster_aktiv` | `..._gunstiges_fenster_aktiv` |
+| `..._datenbasis_unvollstaendig` | `..._datenbasis_unvollstandig` |
+
+Die drei Werte `unknown` sind korrekt: ohne Ladeanlass gibt es kein
+Zeitfenster und keine Ersparnisschätzung.
+
+`update.strom_optimierung_update` stammt von HACS, nicht von dieser
+Integration.
+
 ## Zusätzliche Referenzen des Dashboards
 
 `strom_v1_dashboard.yaml` zeigt über die oben gelisteten hinaus weitere

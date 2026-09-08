@@ -61,24 +61,24 @@ Danach Home Assistant neu starten und die Integration unter
   `periods` mit den Preisfenstern bereitstellen (Pflicht)
 - PV-Prognose, PV-Ist, Netzleistung, Speicher-Ladestand und ein angekündigter
   Großverbraucher sind jeweils optional. Was fehlt, meldet
-  `binary_sensor.strom_optimierung_datenbasis_unvollstaendig`.
+  `binary_sensor.strom_optimierung_datenbasis_unvollstandig`.
 
 ## Bereitgestellte Entities
 
 | Entity | Bedeutung |
 |---|---|
 | `sensor.strom_optimierung_empfehlung` | `idle`, `charge_pv`, `charge_price`, `charge_anticipatory` oder `hold`; Attribute tragen Begründung, Quelle, Fenster, Ersparnis und die letzten fünf Entscheidungen |
-| `sensor.strom_optimierung_ziel_soc` | Ziel-Ladestand in Prozent |
+| `sensor.strom_optimierung_ziel_ladestand` | Ziel-Ladestand in Prozent |
 | `sensor.strom_optimierung_empfohlene_ladeleistung` | Rechnerische Ladeleistung für das Fenster |
 | `sensor.strom_optimierung_netzleistung` | Summe der konfigurierten Phasen als ein Wert; negativ bedeutet Einspeisung |
-| `sensor.strom_optimierung_pv_ueberschuss` | Erkannter Überschuss |
+| `sensor.strom_optimierung_pv_uberschuss` | Erkannter Überschuss |
 | `sensor.strom_optimierung_erwarteter_grossverbrauch` | Angekündigte Last im 24-Stunden-Horizont |
 | `sensor.strom_optimierung_erwartete_ersparnis` | Geschätzte Ersparnis der Empfehlung |
 | `sensor.strom_optimierung_ladefenster_start` / `_ende` | Zeitfenster der Empfehlung |
 | `sensor.strom_optimierung_entscheidungsquelle` | `rule`, `ai` oder `ai_fallback` |
 | `binary_sensor.strom_optimierung_laden_empfohlen` | An bei jeder Ladeaktion |
-| `binary_sensor.strom_optimierung_guenstiges_fenster_aktiv` | An während eines günstigen Fensters |
-| `binary_sensor.strom_optimierung_datenbasis_unvollstaendig` | An bei fehlenden Eingangswerten; Attribut nennt welche |
+| `binary_sensor.strom_optimierung_gunstiges_fenster_aktiv` | An während eines günstigen Fensters |
+| `binary_sensor.strom_optimierung_datenbasis_unvollstandig` | An bei fehlenden Eingangswerten; Attribut nennt welche |
 
 ## Dashboard
 

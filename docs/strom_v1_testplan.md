@@ -37,9 +37,9 @@ Ursache. Genau das ist einmal passiert, siehe `strom_v1_changelog.md`.
 | B4 | KI-Pfad einschalten ohne `ai_task`-Entity | Dialog weist mit „Für den KI-Pfad muss eine ai_task-Entity ausgewählt werden" zurück |
 | B5 | `sensor.strom_optimierung_empfehlung` prüfen | Zeigt eine der fünf Aktionen, nicht `unavailable` |
 | B6 | Attribut `erlaeuterung` lesen | Enthält einen verständlichen deutschen Satz mit konkreten Zahlen |
-| B7 | `binary_sensor.strom_optimierung_datenbasis_unvollstaendig` prüfen | Solange der Marstek ausgefallen ist: *an*, Attribut `fehlende_daten` nennt „Speicher-SoC" |
+| B7 | `binary_sensor.strom_optimierung_datenbasis_unvollstandig` prüfen | Solange der Marstek ausgefallen ist: *an*, Attribut `fehlende_daten` nennt „Speicher-SoC" |
 | B8 | Integration zweimal hinzufügen | Zweiter Versuch wird mit „bereits eingerichtet" abgebrochen |
-| B9 | Über **Konfigurieren** die Kapazität ändern | Integration lädt neu, `sensor.strom_optimierung_ziel_soc` rechnet mit dem neuen Wert |
+| B9 | Über **Konfigurieren** die Kapazität ändern | Integration lädt neu, `sensor.strom_optimierung_ziel_ladestand` rechnet mit dem neuen Wert |
 | B10 | Diagnose herunterladen | Enthält Konfiguration, Eingangswerte, letzte Entscheidung und die Historie |
 | B11 | Attribut `letzte_entscheidungen` der Empfehlungs-Entity prüfen | Nach dem ersten Lauf ein Eintrag; nach einigen Minuten ohne Änderung **weiterhin** ein Eintrag, keine Duplikate |
 | B12 | Warten, bis sich die Empfehlung ändert | Ein zweiter Eintrag erscheint, der ältere rutscht nach hinten; höchstens fünf Einträge |
@@ -70,7 +70,7 @@ eigentliche Wirksamkeitsnachweis, bevor über eine Aktorebene gesprochen wird.
 | C1 | Tritt `charge_price` in den erkennbar günstigen Stunden auf? | Bestätigt Anforderung 1 |
 | C2 | Erscheint `charge_anticipatory` vor der von `ww_v3` angekündigten Warmwasserladung? | Bestätigt Anforderung 2 |
 | C3 | Springt die Empfehlung an sonnigen Tagen auf `charge_pv`? | Bestätigt Anforderung 3 **und** die Vorzeichenannahme B1. Tritt sie nie auf, ist B1 zu prüfen. |
-| C4 | Sinkt `sensor.strom_optimierung_ziel_soc` vor einem sonnigen Folgetag? | Bestätigt Anforderung 4 |
+| C4 | Sinkt `sensor.strom_optimierung_ziel_ladestand` vor einem sonnigen Folgetag? | Bestätigt Anforderung 4 |
 | C5 | Weicht die KI bei aktiviertem Pfad von der Regel ab, und ist die Begründung nachvollziehbar? | Bewertet Anforderung 5 |
 | C6 | Steht `sensor.strom_optimierung_entscheidungsquelle` dauerhaft auf `ai_fallback`? | Deutet auf ein Problem mit der `ai_task`-Entity hin; Protokoll prüfen |
 
@@ -80,5 +80,5 @@ eigentliche Wirksamkeitsnachweis, bevor über eine Aktorebene gesprochen wird.
 |---|---|
 | D1 | Neuen CSV-Export aller `marstek`-Entities erstellen, inklusive der Attribute von `select.marstek_venus_modbus_benutzer_modus` (dort steht die Optionsliste) |
 | D2 | `sensor.marstek_venus_modbus_soc_batterie` im Dialog unter **Konfigurieren** als Ladestand eintragen |
-| D3 | Prüfen, dass `binary_sensor.strom_optimierung_datenbasis_unvollstaendig` auf *aus* geht |
+| D3 | Prüfen, dass `binary_sensor.strom_optimierung_datenbasis_unvollstandig` auf *aus* geht |
 | D4 | Erst danach über eine Aktorebene sprechen – siehe `strom_v1_open_questions.md`, C1 |
