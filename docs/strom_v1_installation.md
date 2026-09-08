@@ -59,18 +59,32 @@ curl -s https://api.github.com/repos/aschmidtlev/strom-optimierung/releases
 Kommt `[]` zurück, existiert kein Release – dann verfolgt HACS den
 Standardbranch und zeigt keine Versionssprünge an.
 
-**Release anlegen:** auf GitHub unter **Releases → Draft a new release** den
-bereits vorhandenen Tag auswählen, als Titel die Versionsnummer eintragen und
-veröffentlichen. Danach in HACS beim Repository über das Dreipunktmenü
-**Informationen aktualisieren** wählen; anschliessend erscheint das Update.
+**Das Release entsteht automatisch.** `.github/workflows/release.yml` legt zu
+jedem gepushten Tag ein GitHub-Release an. Die Action nutzt nur das
+eingebaute Token des Runners und die dort vorinstallierte GitHub-CLI – kein
+eigenes Geheimnis, keine fremde Action. Existiert zum Tag bereits ein
+Release, tut sie nichts, ein erneuter Tag-Push ist also unschädlich.
 
-**Ohne Release**, also solange HACS den Standardbranch verfolgt: im
-Dreipunktmenü **Neu herunterladen** wählen und den Branch `main` bestätigen.
-Das holt den aktuellen Stand, zeigt aber weiterhin keine Versionsnummer.
+Für eine neue Version genügen damit zwei Schritte:
 
-Bei jeder neuen Version gehören damit drei Schritte zusammen: Version in
-`custom_components/strom_optimierung/manifest.json` anheben, Tag mit
-derselben Nummer pushen, Release aus diesem Tag veröffentlichen.
+1. Version in `custom_components/strom_optimierung/manifest.json` anheben und
+   auf `main` pushen.
+2. Tag mit derselben Nummer setzen und pushen:
+   `git tag -a 0.1.2 -m "Version 0.1.2" && git push origin 0.1.2`
+
+Rund eine halbe Minute später steht das Release. Danach in HACS beim
+Repository über das Dreipunktmenü **Informationen aktualisieren** wählen –
+anschliessend wird die neue Version zum Herunterladen angeboten. Nach dem
+Download Home Assistant neu starten.
+
+Wird ein Tag versehentlich auf den falschen Commit gesetzt, lässt er sich
+verschieben, solange noch kein Release daran hängt:
+
+```bash
+git push origin :refs/tags/0.1.2
+git tag -f -a 0.1.2 -m "Version 0.1.2" HEAD
+git push origin 0.1.2
+```
 
 ## 3. Manuelle Installation
 

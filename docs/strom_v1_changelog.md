@@ -20,6 +20,15 @@ Fehlerkorrektur nach der ersten Installation auf der Zielanlage.
   Repository braucht. Das Hinzufügen war mit `GitHub returned 404`
   gescheitert, weil das Repository privat ist – GitHub antwortet dort
   bewusst mit 404 statt 403.
+- **Neue Version wurde in HACS nicht angeboten.** HACS ermittelt die Version
+  eines Custom Repositories aus den GitHub-Releases, nicht aus
+  `manifest.json`. Das Repository hatte keine Releases, HACS verfolgte
+  deshalb nur den Standardbranch. Ein blosser Git-Tag hilft ebenfalls nicht:
+  GitHub erzeugt daraus kein Release.
+- `.github/workflows/release.yml` legt nun zu jedem gepushten Tag ein Release
+  an, mit dem eingebauten Runner-Token und der dort vorinstallierten
+  GitHub-CLI – ohne eigenes Geheimnis und ohne fremde Action. Damit kann ein
+  Release nicht mehr vergessen werden.
 
 ## 0.1.0 – 09.09.2026
 
