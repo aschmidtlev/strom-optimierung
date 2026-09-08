@@ -1,0 +1,571 @@
+# =============================================================================
+# Lovelace-Dashboard: Strom-Optimierung strom_v1
+#
+# Abweichung von der ww_v3-Konvention "ausschliesslich native Karten":
+# Die erste Karte der Ansicht "Stromfluss" nutzt `custom:power-flow-card-plus`.
+# Das ist die einzige HACS-Abhaengigkeit des Dashboards. Sie ist auf der
+# Zielanlage belegt vorhanden (`update.power_flow_card_plus_update` im
+# Snapshot). Direkt darunter steht dieselbe Information als native
+# entities-Karte - faellt die Zusatzkarte aus oder fehlt sie, bleibt das
+# Dashboard vollstaendig benutzbar. Alle uebrigen Karten sind nativ.
+#
+# Der Batteriespeicher fehlt bewusst im Stromfluss: saemtliche
+# `sensor.marstek_venus_modbus_*` waren im Snapshot `unavailable`,
+# `binary_sensor.marstek_venus_modbus_modbus_verbindung` steht auf `off`.
+# Der fertige Konfigurationsblock zum Nachruesten steht als Kommentar an der
+# betreffenden Stelle. Siehe docs/strom_v1_open_questions.md, A2.
+#
+# Es wird nichts geschaltet. Alle Karten sind schreibgeschuetzte Anzeigen -
+# passend dazu, dass die Integration selbst keinen Aktor bedient.
+# =============================================================================
+title: Strom-Optimierung
+views:
+  # ===========================================================================
+  # 1. Stromfluss
+  # ===========================================================================
+  - title: Stromfluss
+    path: strom_v1_fluss
+    icon: mdi:transmission-tower
+    type: masonry
+    badges:
+      - entity: binary_sensor.strom_optimierung_laden_empfohlen
+        name: Laden empfohlen
+      - entity: binary_sensor.strom_optimierung_guenstiges_fenster_aktiv
+        name: Guenstiges Fenster
+      - entity: binary_sensor.marstek_venus_modbus_modbus_verbindung
+        name: Speicher-Modbus
+      - entity: sensor.home_aktueller_strompreis
+        name: Preis
+    cards:
+      - type: custom:power-flow-card-plus
+        title: Stromfluss
+        entities:
+          grid:
+            entity: sensor.strom_optimierung_netzleistung
+            name: Netz
+            # Annahme: positiv = Bezug, negativ = Einspeisung. Nicht
+            # verifiziert - siehe docs/strom_v1_open_questions.md, B1.
+            # Zeigt die Karte bei Sonne nie eine Einspeisung, ist genau das
+            # die Ursache.
+          solar:
+            entity: sensor.stp10_0_3av_40_040_pv_power
+            name: PV gesamt
+            icon: mdi:solar-power-variant
+          home:
+            entity: sensor.ww_v3_hausverbrauch_berechnet
+            name: Haus
+            icon: mdi:home-lightning-bolt
+          # ---------------------------------------------------------------
+          # Speicher nachruesten, sobald der Marstek wieder liefert:
+          # 1. In der Integration unter "Konfigurieren" den Ladestand auf
+          #    sensor.marstek_venus_modbus_soc_batterie setzen.
+          # 2. Die folgenden vier Zeilen einkommentieren.
+          # 3. Vorher pruefen, welches Vorzeichen
+          #    sensor.marstek_venus_modbus_batterieleistung beim Laden zeigt -
+          #    die Konvention ist laut ww_v3_open_questions.md B6 unverifiziert.
+          # battery:
+          #   entity: sensor.marstek_venus_modbus_batterieleistung
+          #   state_of_charge: sensor.marstek_venus_modbus_soc_batterie
+          #   name: Marstek Venus
+          # ---------------------------------------------------------------
+          individual:
+            - entity: sensor.waschmaschine_energy_power
+              name: Waschmaschine
+              icon: mdi:washing-machine
+            - entity: sensor.trockner_aktuelle_leistung
+              name: Trockner
+              icon: mdi:tumble-dryer
+        clickable_entities: true
+        w_decimals: 0
+        kw_decimals: 2
+        watt_threshold: 1000
+        min_flow_rate: 0.75
+        max_flow_rate: 6
+
+      - type: entities
+        title: Leistungsbilanz
+        # Dieselben Werte als native Karte - Rueckfallebene, falls
+        # power-flow-card-plus fehlt, und zugleich die exakten Zahlen.
+        state_color: true
+        entities:
+          - entity: sensor.strom_optimierung_netzleistung
+            name: Netz gesamt
+          - type: section
+            label: Einzelne Phasen
+          - entity: sensor.shellypro3em_ecc9ffe7c9dc_phase_a_leistung
+            name: Phase A
+          - entity: sensor.shellypro3em_ecc9ffe7c9dc_phase_b_leistung
+            name: Phase B
+          - entity: sensor.shellypro3em_ecc9ffe7c9dc_phase_c_leistung
+            name: Phase C
+          - type: section
+            label: Erzeugung und Verbrauch
+          - entity: sensor.stp10_0_3av_40_040_pv_power
+            name: PV gesamt
+          - entity: sensor.stp10_0_3av_40_040_pv_power_a
+            name: PV String A
+          - entity: sensor.stp10_0_3av_40_040_pv_power_b
+            name: PV String B
+          - entity: sensor.ww_v3_hausverbrauch_berechnet
+            name: Hausverbrauch
+          - entity: sensor.tibber_pulse_home_energie
+            name: Tibber Pulse Leistung
+          - entity: sensor.strom_optimierung_pv_ueberschuss
+            name: Erkannter PV-Ueberschuss
+
+      - type: markdown
+        title: Speicherstatus
+        content: >-
+          {% set verbindung = states('binary_sensor.marstek_venus_modbus_modbus_verbindung') %}
+          {% if verbindung == 'on' %}
+          Der Marstek Venus ist ueber Modbus erreichbar.
+          Ladestand: {{ states('sensor.marstek_venus_modbus_soc_batterie') }} %.
+
+          Falls der Ladestand in der Integration noch nicht hinterlegt ist:
+          unter Einstellungen, Geraete und Dienste, Strom-Optimierung,
+          Konfigurieren eintragen.
+          {% else %}
+          **Der Batteriespeicher liefert derzeit keine Daten.**
+
+          `binary_sensor.marstek_venus_modbus_modbus_verbindung` steht auf
+          `{{ verbindung }}`. Der Speicher fehlt deshalb im Stromfluss oben,
+          und die Empfehlung arbeitet ohne Ladestand - sichtbar an
+          `binary_sensor.strom_optimierung_datenbasis_unvollstaendig`.
+
+          Die Entscheidungslogik laeuft trotzdem: sie sagt weiterhin, wann
+          geladen werden sollte, nur ohne zu wissen, wie voll der Speicher
+          gerade ist.
+          {% endif %}
+
+      - type: entities
+        title: Weitere Verbraucher
+        # Nur Anzeige. Diese Geraete werden von der Integration bewusst nicht
+        # automatisiert - siehe docs/strom_v1_open_questions.md, C2.
+        state_color: true
+        entities:
+          - entity: sensor.waschmaschine_energy_power
+            name: Waschmaschine
+          - entity: sensor.trockner_aktuelle_leistung
+            name: Trockner
+          - entity: binary_sensor.trockner_lauft
+            name: Trockner laeuft
+          - entity: sensor.spuehlmaschine_energy_power
+            name: Spuelmaschine
+          - entity: sensor.kuehlschrank_kueche_energy_power
+            name: Kuehlschrank Kueche
+
+      - type: history-graph
+        title: Leistungsverlauf 24 h
+        hours_to_show: 24
+        entities:
+          - entity: sensor.strom_optimierung_netzleistung
+            name: Netz
+          - entity: sensor.stp10_0_3av_40_040_pv_power
+            name: PV
+          - entity: sensor.ww_v3_hausverbrauch_berechnet
+            name: Haus
+
+  # ===========================================================================
+  # 2. Entscheidung
+  # ===========================================================================
+  - title: Entscheidung
+    path: strom_v1_entscheidung
+    icon: mdi:lightbulb-on-outline
+    type: masonry
+    badges:
+      - entity: sensor.strom_optimierung_empfehlung
+        name: Empfehlung
+      - entity: sensor.strom_optimierung_ziel_soc
+        name: Ziel-SoC
+      - entity: sensor.strom_optimierung_entscheidungsquelle
+        name: Quelle
+    cards:
+      - type: markdown
+        content: >-
+          {% set aktion = states('sensor.strom_optimierung_empfehlung') %}
+          {% set symbol = {'charge_pv': 'PV', 'charge_price': 'PREIS',
+             'charge_anticipatory': 'VORLADEN', 'hold': 'HALTEN',
+             'idle': 'ABWARTEN'}.get(aktion, aktion) %}
+          ## {{ symbol }}
+
+          **{{ state_attr('sensor.strom_optimierung_empfehlung','begruendung') }}**
+
+          {{ state_attr('sensor.strom_optimierung_empfehlung','erlaeuterung') }}
+
+      - type: markdown
+        title: Letzte drei Entscheidungen
+        # Speist sich aus dem Attribut `letzte_entscheidungen` der
+        # Empfehlungs-Entity. Logbuch und Verlaufsdiagramm koennen das nicht
+        # leisten: sie zeigen nur den Zustandswert, die Begruendung ginge
+        # verloren. Ein neuer Eintrag entsteht erst, wenn sich Aktion oder
+        # Begruendung tatsaechlich aendern - nicht bei jedem Aktualisierungslauf.
+        content: >-
+          {% set eintraege = state_attr('sensor.strom_optimierung_empfehlung',
+             'letzte_entscheidungen') or [] %}
+          {% set beschriftung = {
+             'charge_pv': 'Laden aus PV-Ueberschuss',
+             'charge_price': 'Laden im guenstigen Fenster',
+             'charge_anticipatory': 'Vorladen fuer Grossverbraucher',
+             'hold': 'Halten',
+             'idle': 'Abwarten'} %}
+          {% if eintraege | count == 0 %}
+          Noch keine Entscheidung aufgezeichnet. Der erste Eintrag entsteht,
+          sobald die Integration einmal durchgelaufen ist.
+          {% else %}
+          {% for eintrag in eintraege[:3] %}
+          ### {{ as_timestamp(eintrag.zeit) | timestamp_custom('%d.%m. %H:%M') }} — {{ beschriftung.get(eintrag.aktion, eintrag.aktion) }}
+
+          **{{ eintrag.begruendung }}**
+
+          {{ eintrag.erlaeuterung }}
+
+          Ziel-Ladestand {{ eintrag.ziel_soc }} %{% if eintrag.ersparnis_ct is not none %}, erwartete Ersparnis {{ eintrag.ersparnis_ct }} ct{% endif %}{% if eintrag.quelle != 'rule' %}, Quelle {{ eintrag.quelle }}{% endif %}.
+
+          {% if not loop.last %}---{% endif %}
+          {% endfor %}
+          {% endif %}
+
+      - type: entities
+        title: Eckwerte der Empfehlung
+        state_color: true
+        entities:
+          - entity: sensor.strom_optimierung_empfehlung
+            name: Aktion
+          - entity: sensor.strom_optimierung_ziel_soc
+            name: Ziel-Ladestand
+          - entity: sensor.strom_optimierung_empfohlene_ladeleistung
+            name: Empfohlene Ladeleistung
+          - entity: sensor.strom_optimierung_erwartete_ersparnis
+            name: Erwartete Ersparnis
+          - type: section
+            label: Zeitfenster
+          - entity: sensor.strom_optimierung_ladefenster_start
+            name: Fenster Start
+          - entity: sensor.strom_optimierung_ladefenster_ende
+            name: Fenster Ende
+          - type: section
+            label: Herkunft
+          - entity: sensor.strom_optimierung_entscheidungsquelle
+            name: Entscheidungsquelle
+          - entity: binary_sensor.strom_optimierung_laden_empfohlen
+            name: Laden empfohlen
+
+      - type: gauge
+        title: Ziel-Ladestand
+        entity: sensor.strom_optimierung_ziel_soc
+        min: 0
+        max: 100
+        needle: true
+        severity:
+          green: 0
+          yellow: 60
+          red: 90
+
+      - type: entities
+        title: Antizipierte Grossverbraucher
+        # Nur die Warmwasserbereitung kuendigt ihren Start an und kann deshalb
+        # eingeplant werden - siehe docs/strom_v1_function_matrix.md.
+        entities:
+          - entity: sensor.strom_optimierung_erwarteter_grossverbrauch
+            name: Erwartete Last im 24-h-Horizont
+          - entity: sensor.ww_v3_naechster_bestpreis_start
+            name: Warmwasser, angekuendigter Start
+          - entity: sensor.ww_v3_naechster_bestpreis_in
+            name: Warmwasser, Start in
+          - entity: binary_sensor.ww_v3_tibber_wirtschaftlich
+            name: Warmwasser, Preis wirtschaftlich
+
+      - type: history-graph
+        title: Verlauf der Empfehlung
+        hours_to_show: 48
+        entities:
+          - entity: sensor.strom_optimierung_empfehlung
+            name: Empfehlung
+          - entity: sensor.strom_optimierung_ziel_soc
+            name: Ziel-Ladestand
+          - entity: binary_sensor.strom_optimierung_guenstiges_fenster_aktiv
+            name: Guenstiges Fenster
+
+      - type: logbook
+        title: Aenderungen
+        hours_to_show: 48
+        entities:
+          - sensor.strom_optimierung_empfehlung
+          - binary_sensor.strom_optimierung_laden_empfohlen
+
+  # ===========================================================================
+  # 3. Preise und Prognose
+  # ===========================================================================
+  - title: Preise
+    path: strom_v1_preise
+    icon: mdi:chart-line
+    type: masonry
+    badges:
+      - entity: binary_sensor.home_bestpreis_zeitraum
+        name: Bestpreis
+      - entity: binary_sensor.home_spitzenpreis_zeitraum
+        name: Spitzenpreis
+      - entity: sensor.home_aktuelles_preisniveau
+        name: Niveau
+      - entity: sensor.home_aktueller_preisrang_heute
+        name: Rang heute
+    cards:
+      - type: entities
+        title: Preis jetzt und naechste Stunden
+        entities:
+          - entity: sensor.home_aktueller_strompreis
+            name: Jetzt
+          - entity: sensor.home_nachster_strompreis
+            name: Naechstes Intervall
+          - type: section
+            label: Vorschau
+          - entity: sensor.home_preis_nachste_1h
+            name: In 1 h
+          - entity: sensor.home_preis_nachste_2h
+            name: In 2 h
+          - entity: sensor.home_preis_nachste_3h
+            name: In 3 h
+          - entity: sensor.home_preis_nachste_4h
+            name: In 4 h
+          - entity: sensor.home_preis_nachste_5h
+            name: In 5 h
+          - entity: sensor.home_preis_vorlaufend_24h
+            name: Mittel 24 h
+
+      - type: entities
+        title: Tagesspanne
+        entities:
+          - entity: sensor.home_mindestpreis_heute
+            name: Minimum heute
+          - entity: sensor.home_hochstpreis_heute
+            name: Maximum heute
+          - entity: sensor.home_mindestpreis_morgen
+            name: Minimum morgen
+          - entity: sensor.home_hochstpreis_morgen
+            name: Maximum morgen
+          - type: section
+            label: Einordnung
+          - entity: sensor.home_aktueller_preisrang_heute
+            name: Perzentilrang jetzt
+          - entity: sensor.home_preismuster_heute
+            name: Preismuster heute
+          - entity: sensor.home_volatilitat_heute
+            name: Volatilitaet heute
+          - entity: sensor.home_aktuelle_preisphase
+            name: Aktuelle Phase
+
+      - type: entities
+        title: Guenstiges Fenster
+        state_color: true
+        entities:
+          - entity: binary_sensor.home_bestpreis_zeitraum
+            name: Laeuft gerade
+          - entity: sensor.home_bestpreis_startet
+            name: Startet
+          - entity: sensor.home_bestpreis_startet_in
+            name: Startet in
+          - entity: sensor.home_bestpreis_endet
+            name: Endet
+          - type: attribute
+            entity: binary_sensor.home_bestpreis_zeitraum
+            attribute: price_mean
+            name: Mittelpreis des Fensters
+            suffix: " ct/kWh"
+          - type: attribute
+            entity: binary_sensor.home_bestpreis_zeitraum
+            attribute: duration_minutes
+            name: Dauer
+            suffix: " min"
+
+      - type: entities
+        title: Teures Fenster
+        state_color: true
+        entities:
+          - entity: binary_sensor.home_spitzenpreis_zeitraum
+            name: Laeuft gerade
+          - entity: sensor.home_spitzenpreis_startet
+            name: Startet
+          - entity: sensor.home_spitzenpreis_startet_in
+            name: Startet in
+          - entity: sensor.home_spitzenpreis_endet
+            name: Endet
+          - type: attribute
+            entity: binary_sensor.home_spitzenpreis_zeitraum
+            attribute: price_mean
+            name: Mittelpreis des Fensters
+            suffix: " ct/kWh"
+          - type: attribute
+            entity: binary_sensor.home_spitzenpreis_zeitraum
+            attribute: duration_minutes
+            name: Dauer
+            suffix: " min"
+
+      - type: markdown
+        title: Lohnt sich Netzladen gerade?
+        # Rechnet die Schwelle aus der Funktionsmatrix nach. Die Parameter
+        # Wirkungsgrad und Verschleissaufschlag sind hier fest hinterlegt und
+        # muessen mit den Einstellungen der Integration uebereinstimmen.
+        content: >-
+          {% set wirkungsgrad = 0.90 %}
+          {% set aufschlag = 2.0 %}
+          {% set jetzt = states('sensor.home_aktueller_strompreis') | float(0) %}
+          {% set maximum = states('sensor.home_hochstpreis_heute') | float(0) %}
+          {% set schwelle = jetzt / wirkungsgrad + aufschlag %}
+          Aktueller Preis: **{{ jetzt | round(2) }} ct/kWh**
+
+          Nach Verlusten und Verschleiss kostet die gespeicherte Kilowattstunde
+          **{{ schwelle | round(2) }} ct**.
+
+          Hoechstpreis heute: **{{ maximum | round(2) }} ct/kWh**
+
+          {% if maximum > schwelle %}
+          Der Abstand von {{ (maximum - schwelle) | round(2) }} ct traegt einen
+          Ladezyklus.
+          {% else %}
+          Die Spanne traegt derzeit keinen Ladezyklus.
+          {% endif %}
+
+      - type: entities
+        title: PV-Prognose beider Anlagen
+        # Welche Instanz Ost und welche West ist, wurde nicht bestimmt - die
+        # Logik summiert beide. Siehe docs/strom_v1_open_questions.md, B2.
+        entities:
+          - type: section
+            label: Rest heute
+          - entity: sensor.energy_production_today_remaining
+            name: Anlage 1
+          - entity: sensor.energy_production_today_remaining_2
+            name: Anlage 2
+          - type: section
+            label: Morgen
+          - entity: sensor.energy_production_tomorrow
+            name: Anlage 1
+          - entity: sensor.energy_production_tomorrow_2
+            name: Anlage 2
+          - type: section
+            label: Naechste Stunde
+          - entity: sensor.energy_next_hour
+            name: Anlage 1
+          - entity: sensor.energy_next_hour_2
+            name: Anlage 2
+          - type: section
+            label: Erzeugungsspitze
+          - entity: sensor.power_highest_peak_time_today
+            name: Anlage 1, heute
+          - entity: sensor.power_highest_peak_time_today_2
+            name: Anlage 2, heute
+          - entity: sensor.power_highest_peak_time_tomorrow
+            name: Anlage 1, morgen
+          - entity: sensor.power_highest_peak_time_tomorrow_2
+            name: Anlage 2, morgen
+
+      - type: history-graph
+        title: Preisverlauf 48 h
+        hours_to_show: 48
+        entities:
+          - entity: sensor.home_aktueller_strompreis
+            name: Strompreis
+          - entity: binary_sensor.home_bestpreis_zeitraum
+            name: Guenstig
+          - entity: binary_sensor.home_spitzenpreis_zeitraum
+            name: Teuer
+
+  # ===========================================================================
+  # 4. Diagnose
+  # ===========================================================================
+  - title: Diagnose
+    path: strom_v1_diagnose
+    icon: mdi:stethoscope
+    type: masonry
+    badges:
+      - entity: binary_sensor.strom_optimierung_datenbasis_unvollstaendig
+        name: Daten unvollstaendig
+      - entity: binary_sensor.home_tibber_api_verbindung
+        name: Tibber
+      - entity: binary_sensor.marstek_venus_modbus_modbus_verbindung
+        name: Marstek
+      - entity: sensor.stp10_0_3av_40_040_status
+        name: Wechselrichter
+    cards:
+      - type: markdown
+        title: Datenbasis
+        content: >-
+          {% set fehlend = state_attr('binary_sensor.strom_optimierung_datenbasis_unvollstaendig','fehlende_daten') %}
+          {% if fehlend %}
+          Diese Eingangswerte fehlen der Entscheidungslogik:
+
+          {% for eintrag in fehlend %}
+          - {{ eintrag }}
+          {% endfor %}
+
+          Solange der Marstek ausgefallen ist, ist "Speicher-SoC" hier
+          erwartet und kein Fehler.
+          {% else %}
+          Alle Eingangswerte liegen vor.
+          {% endif %}
+
+      - type: entities
+        title: Quellen der Preisdaten
+        state_color: true
+        entities:
+          - entity: binary_sensor.home_tibber_api_verbindung
+            name: Tibber-API
+          - entity: binary_sensor.home_morgige_daten_verfugbar
+            name: Morgige Preise verfuegbar
+          - entity: sensor.home_abonnementstatus
+            name: Abonnementstatus
+          - entity: sensor.home_datenlebenszyklus_status
+            name: Datenlebenszyklus
+
+      - type: entities
+        title: Quellen der Anlagendaten
+        state_color: true
+        entities:
+          - entity: sensor.stp10_0_3av_40_040_status
+            name: Wechselrichter Status
+          - entity: sensor.stp10_0_3av_40_040_inverter_condition
+            name: Wechselrichter Zustand
+          - entity: sensor.stp10_0_3av_40_040_daily_yield
+            name: Tagesertrag
+          - entity: sensor.stp10_0_3av_40_040_total_yield
+            name: Gesamtertrag
+          - type: section
+            label: Batteriespeicher
+          - entity: binary_sensor.marstek_venus_modbus_modbus_verbindung
+            name: Modbus-Verbindung
+          - entity: sensor.ww_v3_marstek_stufe
+            name: Stufe laut ww_v3
+          - entity: binary_sensor.ww_v3_marstek_verfuegbar
+            name: Verfuegbar laut ww_v3
+
+      - type: entities
+        title: Verbrauchszaehler
+        entities:
+          - entity: sensor.tibber_pulse_home_kumulierter_verbrauch
+            name: Verbrauch kumuliert
+          - entity: sensor.tibber_pulse_home_kumulierte_kosten
+            name: Kosten kumuliert
+          - entity: sensor.tibber_pulse_home_geschatzter_verbrauch_aktuelle_stunde
+            name: Schaetzung laufende Stunde
+          - entity: sensor.home_monatlicher_netzverbrauch
+            name: Netzverbrauch Monat
+          - entity: sensor.home_geschatzter_jahresverbrauch
+            name: Jahresverbrauch geschaetzt
+
+      - type: markdown
+        title: Hinweise zu dieser Version
+        content: >-
+          Die Integration **schaltet nichts**. Sie liefert ausschliesslich
+          Empfehlungen. Grund: der Marstek Venus war bei der Entwicklung
+          ausgefallen, und ohne belegte Steuer-Entity waere jede Schaltlogik
+          geraten gewesen.
+
+          Zwei Annahmen sind noch offen:
+
+          - Vorzeichen des Netzzaehlers, angenommen negativ gleich
+            Einspeisung. Zeigt der Stromfluss bei Sonne nie eine Einspeisung,
+            ist das die Ursache.
+          - Ost-West-Zuordnung der PV-Anlagen wurde nicht bestimmt, weil die
+            Logik nur die Summe braucht.
+
+          Einzelheiten in docs/strom_v1_open_questions.md.

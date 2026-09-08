@@ -1,0 +1,26 @@
+# Entity-Snapshots bleiben bewusst lokal.
+# Die Developer-Tools-Exporte enthalten Netzwerk- und Verbrauchsdaten
+# (WLAN-SSID, interne IP-Adressen, Kosten- und Zaehlerstaende) und werden
+# deshalb nicht in dieses oeffentliche Repository aufgenommen. Sie bleiben
+# die Belegquelle der Dokumentation - siehe docs/strom_v1_entity_mapping.md.
+csv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Editoren
+.idea/
+.vscode/
+
+# Windows und OneDrive
+Thumbs.db
+desktop.ini
+.DS_Store
+*.tmp
+*.bak

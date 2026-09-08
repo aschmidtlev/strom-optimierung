@@ -1,0 +1,120 @@
+{
+  "config": {
+    "abort": {
+      "already_configured": "Strom-Optimierung ist bereits eingerichtet."
+    },
+    "error": {
+      "soc_range": "Der Mindest-Ladestand muss unter dem Höchst-Ladestand liegen.",
+      "ai_entity_missing": "Für den KI-Pfad muss eine ai_task-Entity ausgewählt werden."
+    },
+    "step": {
+      "user": {
+        "title": "Strompreis-Quellen",
+        "description": "Die beiden Zeitraum-Sensoren müssen das Attribut 'periods' mit den Preisfenstern liefern.",
+        "data": {
+          "price_now_entity": "Aktueller Strompreis",
+          "cheap_periods_entity": "Günstige Preisfenster (Zeitraum-Sensor)",
+          "expensive_periods_entity": "Teure Preisfenster (Zeitraum-Sensor)",
+          "price_avg_24h_entity": "Mittlerer Preis der nächsten 24 Stunden",
+          "price_min_today_entity": "Mindestpreis heute",
+          "price_max_today_entity": "Höchstpreis heute"
+        }
+      },
+      "pv": {
+        "title": "PV und Netz",
+        "description": "Bei den Prognosefeldern die Sensoren beider Anlagen auswählen; sie werden summiert. Beim Netzzähler alle Phasen auswählen.",
+        "data": {
+          "pv_remaining_today_entities": "PV-Prognose Rest heute",
+          "pv_tomorrow_entities": "PV-Prognose morgen",
+          "pv_power_entity": "PV-Erzeugung jetzt",
+          "grid_power_entities": "Netzleistung (negativ = Einspeisung)",
+          "house_power_entity": "Hausverbrauch"
+        }
+      },
+      "battery": {
+        "title": "Speicher und Grenzwerte",
+        "description": "Der Ladestand ist optional. Fehlt er, arbeitet die Logik eingeschränkt weiter und meldet das.",
+        "data": {
+          "battery_soc_entity": "Ladestand des Speichers",
+          "battery_capacity_kwh": "Nutzbare Kapazität",
+          "round_trip_efficiency": "Wirkungsgrad (0 bis 1)",
+          "cycle_cost_ct_per_kwh": "Verschleissaufschlag je kWh",
+          "min_soc": "Mindest-Ladestand",
+          "max_soc": "Höchst-Ladestand",
+          "max_charge_power_w": "Maximale Ladeleistung",
+          "surplus_threshold_w": "Schwelle für PV-Überschuss",
+          "pv_reserve_enabled": "Ladekapazität für PV-Überschuss freihalten",
+          "pv_reserve_threshold_kwh": "Ab dieser PV-Prognose Kapazität freihalten"
+        }
+      },
+      "loads": {
+        "title": "Großverbraucher und KI",
+        "description": "Nur ein Verbraucher mit angekündigtem Startzeitpunkt kann antizipativ eingeplant werden. Reine Leistungsmesser dienen der Diagnose.",
+        "data": {
+          "dhw_planned_start_entity": "Angekündigter Start der Warmwasserbereitung",
+          "dhw_energy_kwh": "Energiebedarf je Warmwasser-Ladung",
+          "load_power_entities": "Leistungsmesser weiterer Großverbraucher",
+          "ai_enabled": "KI-Entscheidung zusätzlich einholen",
+          "ai_task_entity": "ai_task-Entity"
+        }
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "soc_range": "Der Mindest-Ladestand muss unter dem Höchst-Ladestand liegen."
+    },
+    "step": {
+      "init": {
+        "title": "Speicher und Grenzwerte",
+        "data": {
+          "battery_soc_entity": "Ladestand des Speichers",
+          "battery_capacity_kwh": "Nutzbare Kapazität",
+          "round_trip_efficiency": "Wirkungsgrad (0 bis 1)",
+          "cycle_cost_ct_per_kwh": "Verschleissaufschlag je kWh",
+          "min_soc": "Mindest-Ladestand",
+          "max_soc": "Höchst-Ladestand",
+          "max_charge_power_w": "Maximale Ladeleistung",
+          "surplus_threshold_w": "Schwelle für PV-Überschuss",
+          "pv_reserve_enabled": "Ladekapazität für PV-Überschuss freihalten",
+          "pv_reserve_threshold_kwh": "Ab dieser PV-Prognose Kapazität freihalten"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "empfehlung": {
+        "name": "Empfehlung",
+        "state": {
+          "idle": "Kein Ladeanlass",
+          "charge_pv": "Laden aus PV-Überschuss",
+          "charge_price": "Laden im günstigen Fenster",
+          "charge_anticipatory": "Vorladen für Großverbraucher",
+          "hold": "Halten"
+        }
+      },
+      "ziel_soc": { "name": "Ziel-Ladestand" },
+      "empfohlene_ladeleistung": { "name": "Empfohlene Ladeleistung" },
+      "netzleistung": { "name": "Netzleistung" },
+      "pv_ueberschuss": { "name": "PV-Überschuss" },
+      "erwarteter_grossverbrauch": { "name": "Erwarteter Großverbrauch" },
+      "erwartete_ersparnis": { "name": "Erwartete Ersparnis" },
+      "ladefenster_start": { "name": "Ladefenster Start" },
+      "ladefenster_ende": { "name": "Ladefenster Ende" },
+      "entscheidungsquelle": {
+        "name": "Entscheidungsquelle",
+        "state": {
+          "rule": "Regelbasiert",
+          "ai": "KI",
+          "ai_fallback": "KI ausgefallen, regelbasiert"
+        }
+      }
+    },
+    "binary_sensor": {
+      "laden_empfohlen": { "name": "Laden empfohlen" },
+      "guenstiges_fenster_aktiv": { "name": "Günstiges Fenster aktiv" },
+      "datenbasis_unvollstaendig": { "name": "Datenbasis unvollständig" }
+    }
+  }
+}

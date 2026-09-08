@@ -1,0 +1,12 @@
+{
+  "domain": "strom_optimierung",
+  "name": "Strom-Optimierung",
+  "codeowners": ["@aschmidtlev"],
+  "config_flow": true,
+  "documentation": "https://github.com/aschmidtlev/strom-optimierung",
+  "integration_type": "service",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/aschmidtlev/strom-optimierung/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}
