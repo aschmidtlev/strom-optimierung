@@ -112,15 +112,18 @@ def _opt(key: str, defaults: dict[str, Any]) -> vol.Optional:
 def _number(
     minimum: float, maximum: float, step: float, unit: str | None = None
 ) -> selector.NumberSelector:
-    return selector.NumberSelector(
-        selector.NumberSelectorConfig(
-            min=minimum,
-            max=maximum,
-            step=step,
-            unit_of_measurement=unit,
-            mode=selector.NumberSelectorMode.BOX,
-        )
+    config = selector.NumberSelectorConfig(
+        min=minimum,
+        max=maximum,
+        step=step,
+        mode=selector.NumberSelectorMode.BOX,
     )
+    # `unit_of_measurement` muss weggelassen werden, wenn es keine Einheit
+    # gibt: das Schema von NumberSelector prüft den Schlüssel gegen `str` und
+    # weist `None` zurück. Der Wirkungsgrad ist das einzige einheitenlose Feld.
+    if unit is not None:
+        config["unit_of_measurement"] = unit
+    return selector.NumberSelector(config)
 
 
 def price_schema(defaults: dict[str, Any]) -> vol.Schema:

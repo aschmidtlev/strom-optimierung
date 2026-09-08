@@ -2,10 +2,16 @@
 
 ## Teil A – Automatisierte Tests
 
-Datei `tests/test_optimizer.py`, 26 Fälle. Sie prüfen `optimizer.py`, das
-bewusst keine Home-Assistant-Importe enthält und daher ohne laufende Instanz
-lauffähig ist. Die Zahlenwerte stammen aus dem Snapshot vom 08.09.2026, damit
-die Fälle die reale Preisstruktur abbilden.
+`tests/test_optimizer.py` (26 Fälle) prüft `optimizer.py`, das bewusst keine
+Home-Assistant-Importe enthält und daher ohne laufende Instanz lauffähig ist.
+Die Zahlenwerte stammen aus dem Snapshot vom 08.09.2026, damit die Fälle die
+reale Preisstruktur abbilden.
+
+`tests/test_config_flow.py` (10 Fälle) prüft den Konfigurationsdialog,
+schwerpunktmässig den Bau der Schemata. Ein Selector mit unzulässiger
+Konfiguration wirft erst beim Anzeigen des Formulars und erscheint dem
+Anwender nur als „Unknown error occurred" – ohne jeden Hinweis auf die
+Ursache. Genau das ist einmal passiert, siehe `strom_v1_changelog.md`.
 
 **Status: geschrieben, nicht ausgeführt** – siehe
 `strom_v1_open_questions.md`, B5.
@@ -17,6 +23,9 @@ die Fälle die reale Preisstruktur abbilden.
 | Wirtschaftlichkeit | 1 | Verlust- und Verschleisskorrektur an der Entscheidungsschwelle |
 | Ziel-Ladestand | 5 | Höchstwert ohne PV-Erwartung, Absenkung bei hoher PV-Prognose, Vorrang des angekündigten Bedarfs, abschaltbare PV-Reserve, Deckelung am Höchstwert |
 | Entscheidungen | 12 | Alle fünf Aktionen, Rangfolge PV vor Preis, voller Speicher, fehlende Preisdaten, fehlender Ladestand, Horizontgrenze |
+| Dialogschemata | 6 | Alle vier Schemata bauen mit und ohne Vorbelegung; einheitenloses Zahlenfeld setzt `unit_of_measurement` nicht; Pflichtfelder greifen; plausible Eingabe wird angenommen |
+| Vorschlagswerte | 2 | Alle Vorschläge sind gültige Entity-IDs; der Speicher-Ladestand wird bewusst nicht vorgeschlagen |
+| Eingabebereinigung | 2 | Leere Auswahlfelder entfallen, die Null bleibt erhalten |
 
 ## Teil B – Manuelle Prüfungen nach der Installation
 

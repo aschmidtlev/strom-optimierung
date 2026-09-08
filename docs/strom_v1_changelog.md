@@ -44,6 +44,21 @@ ab. Sie ist vollständig nutzbar: sie sagt, was zu tun wäre, und begründet es.
 - 26 Testfälle gegen die Preisstruktur des realen Snapshots
 - Dokumentation in der Struktur des Nachbarprojekts `ww_v3`
 
+### Nach der ersten Installation behoben
+
+- **Konfigurationsdialog brach im Schritt „PV und Netz" mit „Unknown error
+  occurred" ab.** Ursache war nicht dieser Schritt, sondern das Schema des
+  darauf folgenden: `_number()` setzte `unit_of_measurement=None`, wenn ein
+  Zahlenfeld keine Einheit hat. Das Selector-Schema von Home Assistant prüft
+  diesen Schlüssel gegen `str` und weist `None` zurück; die Ausnahme trat
+  beim Bauen des nächsten Formulars auf und erschien deshalb am vorherigen
+  Schritt. Betroffen war allein der Wirkungsgrad – das einzige einheitenlose
+  Feld. Der Schlüssel wird jetzt weggelassen statt auf `None` gesetzt.
+- Neue Testdatei `tests/test_config_flow.py` mit zehn Fällen. Sie baut alle
+  vier Schemata mit und ohne Vorbelegung und prüft gezielt, dass ein
+  einheitenloses Zahlenfeld den Schlüssel `unit_of_measurement` nicht setzt.
+  Damit fällt diese Fehlerklasse künftig im Test auf statt erst im Dialog.
+
 ### Während der Entwicklung behoben
 
 - **Ziel-Ladestand blieb ohne angekündigten Verbraucher beim Mindestwert.**
