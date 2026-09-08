@@ -44,6 +44,12 @@ Fenster zu 23 ct/kWh später über 27.8 ct/kWh vermeiden, damit geladen wird.
 https://github.com/aschmidtlev/strom-optimierung
 ```
 
+> HACS kann nur auf **öffentliche** Repositories zugreifen. Ist das Repository
+> privat, bricht das Hinzufügen mit `GitHub returned 404` ab – dann entweder
+> die Sichtbarkeit umstellen oder nach Abschnitt 3 der
+> [Installationsanleitung](docs/strom_v1_installation.md) manuell
+> installieren.
+
 Danach Home Assistant neu starten und die Integration unter
 **Einstellungen → Geräte & Dienste** hinzufügen. Ausführlich in der
 [Installationsanleitung](docs/strom_v1_installation.md).

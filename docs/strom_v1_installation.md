@@ -11,11 +11,36 @@
 
 ## 2. Installation über HACS
 
+**Voraussetzung: das Repository muss öffentlich sein.** HACS fragt die
+GitHub-API ohne Zugriff auf private Repositories ab und bricht sonst mit
+`GitHub returned 404 for https://api.github.com/repos/...` ab. GitHub
+antwortet bei privaten Repositories bewusst mit 404 statt 403, damit deren
+Existenz nicht verraten wird – die Meldung bedeutet also nicht, dass das
+Repository fehlt.
+
+Sichtbarkeit anonym prüfen:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" https://api.github.com/repos/aschmidtlev/strom-optimierung
+```
+
+`200` heisst öffentlich, `404` privat. Ein erfolgreiches `git push` oder
+`git ls-remote` ist **kein** Nachweis – dort liefert der Credential-Manager
+die gespeicherten Zugangsdaten.
+
+Umstellen unter **GitHub → Repository → Settings → General → Danger Zone →
+Change repository visibility → Make public**.
+
+Danach:
+
 1. In HACS **Benutzerdefinierte Repositories** öffnen.
 2. `https://github.com/aschmidtlev/strom-optimierung` als Typ *Integration*
    hinzufügen.
 3. „Strom-Optimierung" installieren.
 4. Home Assistant neu starten.
+
+Soll das Repository privat bleiben, ist die manuelle Installation nach
+Abschnitt 3 der Weg – sie kommt ohne HACS aus.
 
 ## 3. Manuelle Installation
 
