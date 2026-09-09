@@ -1,5 +1,43 @@
 # strom_v1 – Änderungsprotokoll
 
+## 0.1.2 – 09.09.2026
+
+Der KI-Pfad war nach der Einrichtung nicht mehr erreichbar.
+
+### Behoben
+
+- **Der Optionen-Dialog zeigte nur die Grenzwerte.** Quell-Entities,
+  Großverbraucher und der gesamte KI-Pfad liessen sich nach dem ersten
+  Speichern nicht mehr ändern – die `ai_task`-Entity war damit dauerhaft
+  festgelegt. Die Optionen bieten jetzt ein Menü über dieselben vier
+  Bereiche wie die Einrichtung.
+- Ein überflüssiger Sonderfall für den KI-Schalter im Optionen-Dialog wurde
+  wieder entfernt: `_strip_empty()` entfernt `False` gar nicht, der Wert kam
+  ohnehin durch. Ein Test hält das jetzt fest.
+
+### Hinzugefügt
+
+- `switch.strom_optimierung_ki_entscheidung_nutzen` – schaltet den KI-Pfad im
+  laufenden Betrieb ein und aus, ohne die Integration neu zu laden. Der
+  Zustand übersteht einen Neustart über `RestoreEntity`; die Option im Dialog
+  legt nur noch den Startwert fest, falls keine frühere Aufzeichnung
+  vorliegt. Attribute nennen die befragte `ai_task`-Entity und ob der
+  Schalter überhaupt wirksam ist.
+- Dashboard: Karte **KI-Pfad** in der Ansicht *Entscheidung*, dazu eine
+  Hinweiskarte, die nur bei `ai_fallback` erscheint und die möglichen
+  Ursachen nennt.
+- Drei weitere Testfunktionen in `tests/test_config_flow.py` (jetzt 12), darunter eine, die
+  sicherstellt, dass jeder Einrichtungsschritt auch in den Optionen
+  erreichbar bleibt.
+
+### Offen
+
+Die Entity-ID `switch.strom_optimierung_ki_entscheidung_nutzen` ist nach der
+bekannten Regel abgeleitet, aber noch nicht gegen einen Snapshot belegt – der
+vorliegende Vollexport entstand vor dieser Version. Der Name enthält keine
+Umlaute, die Ableitung ist daher eindeutig; zu bestätigen ist sie trotzdem,
+siehe `strom_v1_testplan.md`, B13.
+
 ## 0.1.1 – 09.09.2026
 
 Fehlerkorrektur nach der ersten Installation auf der Zielanlage.
@@ -12,7 +50,7 @@ Fehlerkorrektur nach der ersten Installation auf der Zielanlage.
   beim Bauen des nächsten Formulars auf und erschien deshalb am vorherigen
   Schritt. Betroffen war allein der Wirkungsgrad – das einzige einheitenlose
   Feld. Der Schlüssel wird jetzt weggelassen statt auf `None` gesetzt.
-- Neue Testdatei `tests/test_config_flow.py` mit zehn Fällen. Sie baut alle
+- Neue Testdatei `tests/test_config_flow.py` mit neun Testfunktionen. Sie baut alle
   vier Schemata mit und ohne Vorbelegung und prüft gezielt, dass ein
   einheitenloses Zahlenfeld den Schlüssel `unit_of_measurement` nicht setzt.
   Damit fällt diese Fehlerklasse künftig im Test auf statt erst im Dialog.

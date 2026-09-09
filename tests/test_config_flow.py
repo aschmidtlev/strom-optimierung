@@ -15,6 +15,7 @@ import voluptuous as vol
 
 from custom_components.strom_optimierung.config_flow import (
     SUGGESTED,
+    StromOptimierungOptionsFlow,
     _number,
     _strip_empty,
     battery_schema,
@@ -23,6 +24,8 @@ from custom_components.strom_optimierung.config_flow import (
     pv_schema,
 )
 from custom_components.strom_optimierung.const import (
+    CONF_AI_ENABLED,
+    CONF_AI_TASK_ENTITY,
     CONF_MAX_SOC,
     CONF_MIN_SOC,
     CONF_PRICE_NOW,
@@ -120,3 +123,31 @@ def test_strip_empty_removes_blank_selections():
 def test_strip_empty_keeps_zero():
     """Die Null ist ein gültiger Grenzwert und darf nicht wegfallen."""
     assert _strip_empty({CONF_MIN_SOC: 0}) == {CONF_MIN_SOC: 0}
+
+
+def test_strip_empty_keeps_false():
+    """Ein abgeschalteter Schalter muss als `False` erhalten bleiben.
+
+    Fiele er weg, liesse sich der KI-Pfad im Optionen-Dialog nie wieder
+    ausschalten: der alte Wert `True` bliebe stehen.
+    """
+    assert _strip_empty({CONF_AI_ENABLED: False}) == {CONF_AI_ENABLED: False}
+
+
+def test_options_flow_covers_every_setup_step():
+    """Jeder Bereich der Einrichtung muss nachträglich änderbar sein.
+
+    Die erste Fassung bot in den Optionen nur die Grenzwerte an. Damit waren
+    Quell-Entities, Großverbraucher und der KI-Pfad nach dem ersten Speichern
+    eingefroren.
+    """
+    flow = StromOptimierungOptionsFlow()
+    for schritt in ("preise", "pv", "speicher", "lasten"):
+        assert hasattr(flow, f"async_step_{schritt}")
+
+
+def test_loads_schema_offers_the_ai_entity():
+    """Ohne dieses Feld hätte der KI-Schalter keine Gegenstelle."""
+    felder = {str(key) for key in loads_schema(SUGGESTED).schema}
+    assert CONF_AI_TASK_ENTITY in felder
+    assert CONF_AI_ENABLED in felder

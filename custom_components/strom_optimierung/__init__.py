@@ -8,7 +8,11 @@ from homeassistant.core import HomeAssistant
 
 from .coordinator import StromOptimierungCoordinator
 
-PLATFORMS: list[Platform] = [Platform.BINARY_SENSOR, Platform.SENSOR]
+PLATFORMS: list[Platform] = [
+    Platform.BINARY_SENSOR,
+    Platform.SENSOR,
+    Platform.SWITCH,
+]
 
 type StromOptimierungConfigEntry = ConfigEntry[StromOptimierungCoordinator]
 

@@ -118,8 +118,16 @@ und meldet das über `binary_sensor.*_datenbasis_unvollstaendig`.
 **Schritt 4 – Großverbraucher und KI.** Der KI-Pfad ist standardmässig aus.
 Wird er eingeschaltet, muss eine `ai_task`-Entity gewählt werden.
 
-Die Werte aus Schritt 3 lassen sich später jederzeit über **Konfigurieren**
-an der Integration ändern.
+**Alle vier Bereiche** lassen sich später über **Konfigurieren** an der
+Integration erneut öffnen. Der Dialog zeigt dafür ein Menü mit denselben vier
+Abschnitten; es lassen sich also auch Quell-Entities und der KI-Pfad
+nachträglich ändern, nicht nur die Grenzwerte.
+
+Den KI-Pfad im laufenden Betrieb ein- und auszuschalten geht schneller über
+`switch.strom_optimierung_ki_entscheidung_nutzen`. Der Schalter lädt die
+Integration nicht neu; die Option im Dialog legt nur fest, mit welchem
+Zustand sie nach einem Neustart startet, falls kein früherer Zustand
+vorliegt.
 
 ## 5. Prüfung nach der Einrichtung
 

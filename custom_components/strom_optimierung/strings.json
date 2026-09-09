@@ -62,11 +62,45 @@
   },
   "options": {
     "error": {
-      "soc_range": "The minimum state of charge must be below the maximum."
+      "soc_range": "The minimum state of charge must be below the maximum.",
+      "ai_entity_missing": "An ai_task entity is required to enable the AI path."
     },
     "step": {
       "init": {
+        "title": "What would you like to change?",
+        "menu_options": {
+          "preise": "Electricity price sources",
+          "pv": "PV and grid",
+          "speicher": "Battery and limits",
+          "lasten": "Large loads and AI"
+        }
+      },
+      "preise": {
+        "title": "Electricity price sources",
+        "description": "Both period sensors must expose a 'periods' attribute containing the price windows.",
+        "data": {
+          "price_now_entity": "Current electricity price",
+          "cheap_periods_entity": "Cheap price windows (period sensor)",
+          "expensive_periods_entity": "Expensive price windows (period sensor)",
+          "price_avg_24h_entity": "Average price over the next 24 hours",
+          "price_min_today_entity": "Minimum price today",
+          "price_max_today_entity": "Maximum price today"
+        }
+      },
+      "pv": {
+        "title": "PV and grid",
+        "description": "For the forecast fields select the sensors of both arrays; they are summed. For the meter select all phases.",
+        "data": {
+          "pv_remaining_today_entities": "PV forecast remaining today",
+          "pv_tomorrow_entities": "PV forecast tomorrow",
+          "pv_power_entity": "Current PV generation",
+          "grid_power_entities": "Grid power (negative = export)",
+          "house_power_entity": "House consumption"
+        }
+      },
+      "speicher": {
         "title": "Battery and limits",
+        "description": "The state of charge is optional. Without it the logic keeps working in a reduced mode and reports this.",
         "data": {
           "battery_soc_entity": "Battery state of charge",
           "battery_capacity_kwh": "Usable capacity",
@@ -78,6 +112,17 @@
           "surplus_threshold_w": "PV surplus threshold",
           "pv_reserve_enabled": "Keep capacity free for PV surplus",
           "pv_reserve_threshold_kwh": "Reserve capacity above this PV forecast"
+        }
+      },
+      "lasten": {
+        "title": "Large loads and AI",
+        "description": "This selects which ai_task entity the integration may query. Turning the AI on and off afterwards is done with the 'Use AI decision' switch.",
+        "data": {
+          "dhw_planned_start_entity": "Announced start of water heating",
+          "dhw_energy_kwh": "Energy per water heating cycle",
+          "load_power_entities": "Power meters of further large loads",
+          "ai_enabled": "Start with the AI enabled after a restart",
+          "ai_task_entity": "ai_task entity"
         }
       }
     }
@@ -115,6 +160,9 @@
       "laden_empfohlen": { "name": "Charging recommended" },
       "guenstiges_fenster_aktiv": { "name": "Cheap window active" },
       "datenbasis_unvollstaendig": { "name": "Incomplete data" }
+    },
+    "switch": {
+      "ki_entscheidung_nutzen": { "name": "Use AI decision" }
     }
   }
 }

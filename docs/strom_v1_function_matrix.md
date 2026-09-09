@@ -50,6 +50,27 @@ Preis über 27.79 ct/kWh liegen. Das teure Fenster desselben Tages
 | `binary_sensor.*_laden_empfohlen` | An, sobald eine der drei Ladeaktionen empfohlen wird |
 | `binary_sensor.*_guenstiges_fenster_aktiv` | An, solange ein günstiges Preisfenster läuft |
 | `binary_sensor.*_datenbasis_unvollstaendig` | An, wenn Eingangswerte fehlen; Attribut nennt welche |
+| `switch.*_ki_entscheidung_nutzen` | Schaltet den KI-Pfad zur Laufzeit ein und aus; Attribute nennen die befragte `ai_task`-Entity und ob der Schalter wirksam ist |
+
+## Steuerung des KI-Pfads
+
+Zwei Stellen mit klarer Aufgabenteilung:
+
+| Ort | Wofür |
+|---|---|
+| Optionen, Abschnitt „Großverbraucher und KI" | **Welche** `ai_task`-Entity befragt wird, und ob die KI nach einem Neustart aktiviert startet |
+| `switch.*_ki_entscheidung_nutzen` | **Ob** sie gerade befragt wird |
+
+Der Schalter schreibt bewusst nicht in die Konfiguration zurück. Täte er das,
+würde die Integration bei jedem Umschalten neu geladen und alle Entities
+verschwänden kurz. Stattdessen hält er seinen Zustand im Coordinator und
+stellt ihn nach einem Neustart über `RestoreEntity` wieder her; nur wenn
+keine frühere Aufzeichnung vorliegt, gilt der Wert aus den Optionen.
+
+Ist keine `ai_task`-Entity hinterlegt, bleibt der Schalter bedienbar, hat aber
+keine Wirkung – das Attribut `wirksam` macht das sichtbar. Der Schalter ist
+der einzige bedienbare Bedienpunkt der Integration und wirkt ausschliesslich
+intern; an ein Gerät geht auch von ihm kein Befehl.
 
 ## Entscheidungshistorie
 

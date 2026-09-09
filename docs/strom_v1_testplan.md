@@ -7,7 +7,7 @@ Home-Assistant-Importe enthält und daher ohne laufende Instanz lauffähig ist.
 Die Zahlenwerte stammen aus dem Snapshot vom 08.09.2026, damit die Fälle die
 reale Preisstruktur abbilden.
 
-`tests/test_config_flow.py` (10 Fälle) prüft den Konfigurationsdialog,
+`tests/test_config_flow.py` (12 Testfunktionen) prüft den Konfigurationsdialog,
 schwerpunktmässig den Bau der Schemata. Ein Selector mit unzulässiger
 Konfiguration wirft erst beim Anzeigen des Formulars und erscheint dem
 Anwender nur als „Unknown error occurred" – ohne jeden Hinweis auf die
@@ -23,9 +23,10 @@ Ursache. Genau das ist einmal passiert, siehe `strom_v1_changelog.md`.
 | Wirtschaftlichkeit | 1 | Verlust- und Verschleisskorrektur an der Entscheidungsschwelle |
 | Ziel-Ladestand | 5 | Höchstwert ohne PV-Erwartung, Absenkung bei hoher PV-Prognose, Vorrang des angekündigten Bedarfs, abschaltbare PV-Reserve, Deckelung am Höchstwert |
 | Entscheidungen | 12 | Alle fünf Aktionen, Rangfolge PV vor Preis, voller Speicher, fehlende Preisdaten, fehlender Ladestand, Horizontgrenze |
-| Dialogschemata | 6 | Alle vier Schemata bauen mit und ohne Vorbelegung; einheitenloses Zahlenfeld setzt `unit_of_measurement` nicht; Pflichtfelder greifen; plausible Eingabe wird angenommen |
+| Dialogschemata | 5 | Alle vier Schemata bauen mit und ohne Vorbelegung (je parametrisiert); einheitenloses Zahlenfeld setzt `unit_of_measurement` nicht; Pflichtfelder greifen; plausible Eingabe wird angenommen |
 | Vorschlagswerte | 2 | Alle Vorschläge sind gültige Entity-IDs; der Speicher-Ladestand wird bewusst nicht vorgeschlagen |
-| Eingabebereinigung | 2 | Leere Auswahlfelder entfallen, die Null bleibt erhalten |
+| Eingabebereinigung | 3 | Leere Auswahlfelder entfallen; die Null bleibt erhalten; `False` bleibt erhalten, damit sich der KI-Pfad wieder abschalten lässt |
+| Optionen-Dialog | 2 | Jeder Einrichtungsschritt ist auch nachträglich erreichbar; das Lastenschema bietet die `ai_task`-Entity an |
 
 ## Teil B – Manuelle Prüfungen nach der Installation
 
@@ -43,6 +44,13 @@ Ursache. Genau das ist einmal passiert, siehe `strom_v1_changelog.md`.
 | B10 | Diagnose herunterladen | Enthält Konfiguration, Eingangswerte, letzte Entscheidung und die Historie |
 | B11 | Attribut `letzte_entscheidungen` der Empfehlungs-Entity prüfen | Nach dem ersten Lauf ein Eintrag; nach einigen Minuten ohne Änderung **weiterhin** ein Eintrag, keine Duplikate |
 | B12 | Warten, bis sich die Empfehlung ändert | Ein zweiter Eintrag erscheint, der ältere rutscht nach hinten; höchstens fünf Einträge |
+| B13 | **Entity-ID des Schalters prüfen** | Unter Entwicklerwerkzeuge → Zustände muss `switch.strom_optimierung_ki_entscheidung_nutzen` existieren. Die ID ist abgeleitet und noch nicht gegen einen Snapshot belegt – weicht sie ab, muss das Dashboard nachgezogen werden |
+| B14 | **Konfigurieren** öffnen | Menü mit vier Einträgen: Strompreis-Quellen, PV und Netz, Speicher und Grenzwerte, Großverbraucher und KI |
+| B15 | Unter **Großverbraucher und KI** die `ai_task`-Entity setzen und speichern | Wert bleibt beim erneuten Öffnen erhalten |
+| B16 | KI im Optionen-Dialog abwählen und speichern | Der Haken bleibt aus; er darf nicht auf den alten Wert zurückspringen |
+| B17 | Schalter **KI-Entscheidung nutzen** umlegen | Zustand wechselt sofort, die Integration lädt **nicht** neu – die übrigen Entities behalten ihre Werte |
+| B18 | Home Assistant neu starten | Der Schalter steht wieder auf dem zuletzt gewählten Zustand |
+| B19 | Attribut `wirksam` des Schalters prüfen | Ohne hinterlegte `ai_task`-Entity `false`, sonst `true` |
 
 ## Teil B2 – Dashboard
 
@@ -59,6 +67,8 @@ Dashboard → Rohkonfiguration ersetzen).
 | B25 | Ansicht **Preise** öffnen | Karte „Lohnt sich Netzladen gerade?" rechnet die Schwelle aus und nennt sie |
 | B26 | Ansicht **Diagnose** öffnen | Karte „Datenbasis" listet die fehlenden Eingangswerte auf |
 | B27 | Alle vier Ansichten auf Fehlerkarten durchsehen | Keine Karte meldet „Entity nicht gefunden" |
+| B28 | Karte **KI-Pfad** in der Ansicht *Entscheidung* | Schalter ist bedienbar, darunter die befragte `ai_task`-Entity und die zuletzt verwendete Quelle |
+| B29 | Hinweiskarte bei `ai_fallback` | Erscheint nur, wenn `sensor.strom_optimierung_entscheidungsquelle` auf `ai_fallback` steht |
 
 ## Teil C – Beobachtung im Betrieb
 

@@ -299,22 +299,76 @@ class StromOptimierungConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class StromOptimierungOptionsFlow(OptionsFlow):
-    """Nachträgliche Anpassung der Parameter und Quellen."""
+    """Nachträgliche Anpassung aller Quellen und Parameter.
+
+    Bewusst als Menü über dieselben vier Bereiche wie die Einrichtung: sonst
+    liessen sich nach dem ersten Speichern weder die Quell-Entities noch der
+    KI-Pfad je wieder ändern.
+    """
+
+    @property
+    def _current(self) -> dict[str, Any]:
+        return {**self.config_entry.data, **self.config_entry.options}
+
+    def _save(self, user_input: dict[str, Any]) -> ConfigFlowResult:
+        return self.async_create_entry(
+            data={**self._current, **_strip_empty(user_input)}
+        )
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        current = {**self.config_entry.data, **self.config_entry.options}
+        return self.async_show_menu(
+            step_id="init",
+            menu_options=["preise", "pv", "speicher", "lasten"],
+        )
 
+    async def async_step_preise(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            return self._save(user_input)
+        return self.async_show_form(
+            step_id="preise", data_schema=price_schema(self._current)
+        )
+
+    async def async_step_pv(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            return self._save(user_input)
+        return self.async_show_form(
+            step_id="pv", data_schema=pv_schema(self._current)
+        )
+
+    async def async_step_speicher(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         if user_input is not None:
             if user_input[CONF_MIN_SOC] >= user_input[CONF_MAX_SOC]:
                 return self.async_show_form(
-                    step_id="init",
-                    data_schema=battery_schema({**current, **user_input}),
+                    step_id="speicher",
+                    data_schema=battery_schema({**self._current, **user_input}),
                     errors={"base": "soc_range"},
                 )
-            return self.async_create_entry(data={**current, **_strip_empty(user_input)})
-
+            return self._save(user_input)
         return self.async_show_form(
-            step_id="init", data_schema=battery_schema(current)
+            step_id="speicher", data_schema=battery_schema(self._current)
+        )
+
+    async def async_step_lasten(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            if user_input.get(CONF_AI_ENABLED) and not user_input.get(
+                CONF_AI_TASK_ENTITY
+            ):
+                return self.async_show_form(
+                    step_id="lasten",
+                    data_schema=loads_schema({**self._current, **user_input}),
+                    errors={"base": "ai_entity_missing"},
+                )
+            return self._save(user_input)
+        return self.async_show_form(
+            step_id="lasten", data_schema=loads_schema(self._current)
         )

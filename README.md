@@ -79,6 +79,20 @@ Danach Home Assistant neu starten und die Integration unter
 | `binary_sensor.strom_optimierung_laden_empfohlen` | An bei jeder Ladeaktion |
 | `binary_sensor.strom_optimierung_gunstiges_fenster_aktiv` | An während eines günstigen Fensters |
 | `binary_sensor.strom_optimierung_datenbasis_unvollstandig` | An bei fehlenden Eingangswerten; Attribut nennt welche |
+| `switch.strom_optimierung_ki_entscheidung_nutzen` | Schaltet den KI-Pfad zur Laufzeit ein und aus |
+
+## KI-Pfad steuern
+
+Welche `ai_task`-Entity befragt wird, steht in den Optionen der Integration
+unter **Großverbraucher und KI**. Ob sie gerade befragt wird, steuert der
+Schalter `switch.strom_optimierung_ki_entscheidung_nutzen` – umschaltbar
+jederzeit, ohne die Integration neu zu laden.
+
+Ohne hinterlegte `ai_task`-Entity bleibt der Schalter bedienbar, hat aber
+keine Wirkung; das Attribut `wirksam` zeigt das an. Fällt die KI aus oder
+antwortet sie unplausibel, gilt unverändert die regelbasierte Entscheidung –
+sichtbar an `sensor.strom_optimierung_entscheidungsquelle` mit dem Wert
+`ai_fallback`.
 
 ## Dashboard
 

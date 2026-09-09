@@ -116,6 +116,7 @@ gegen eine Instanz, auf der die Integration tatsächlich lief.
 | `laden_empfohlen` | Laden empfohlen | `binary_sensor.strom_optimierung_laden_empfohlen` | off |
 | `guenstiges_fenster_aktiv` | Günstiges Fenster aktiv | `binary_sensor.strom_optimierung_gunstiges_fenster_aktiv` | off |
 | `datenbasis_unvollstaendig` | Datenbasis unvollständig | `binary_sensor.strom_optimierung_datenbasis_unvollstandig` | on |
+| `ki_entscheidung_nutzen` | KI-Entscheidung nutzen | `switch.strom_optimierung_ki_entscheidung_nutzen` | **neu in 0.1.2, noch nicht gegen einen Snapshot verifiziert** |
 
 **Die entity_id folgt dem angezeigten Namen, nicht dem Schlüssel im Code.**
 Home Assistant bildet sie aus Gerätename plus Entity-Name und transliteriert
@@ -133,6 +134,11 @@ Daraus folgen vier Abweichungen, die man nicht erraten kann:
 
 Die drei Werte `unknown` sind korrekt: ohne Ladeanlass gibt es kein
 Zeitfenster und keine Ersparnisschätzung.
+
+Die ID des neuen Schalters ist nach derselben Regel abgeleitet, aber noch
+nicht belegt – der Snapshot entstand vor Version 0.1.2. Der Name enthält
+keine Umlaute, die Ableitung ist deshalb eindeutig; **bestätigt werden muss
+sie trotzdem** (siehe `strom_v1_testplan.md`, B13).
 
 `update.strom_optimierung_update` stammt von HACS, nicht von dieser
 Integration.

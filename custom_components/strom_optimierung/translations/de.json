@@ -62,11 +62,45 @@
   },
   "options": {
     "error": {
-      "soc_range": "Der Mindest-Ladestand muss unter dem Höchst-Ladestand liegen."
+      "soc_range": "Der Mindest-Ladestand muss unter dem Höchst-Ladestand liegen.",
+      "ai_entity_missing": "Für den KI-Pfad muss eine ai_task-Entity ausgewählt werden."
     },
     "step": {
       "init": {
+        "title": "Was möchtest du ändern?",
+        "menu_options": {
+          "preise": "Strompreis-Quellen",
+          "pv": "PV und Netz",
+          "speicher": "Speicher und Grenzwerte",
+          "lasten": "Großverbraucher und KI"
+        }
+      },
+      "preise": {
+        "title": "Strompreis-Quellen",
+        "description": "Die beiden Zeitraum-Sensoren müssen das Attribut 'periods' mit den Preisfenstern liefern.",
+        "data": {
+          "price_now_entity": "Aktueller Strompreis",
+          "cheap_periods_entity": "Günstige Preisfenster (Zeitraum-Sensor)",
+          "expensive_periods_entity": "Teure Preisfenster (Zeitraum-Sensor)",
+          "price_avg_24h_entity": "Mittlerer Preis der nächsten 24 Stunden",
+          "price_min_today_entity": "Mindestpreis heute",
+          "price_max_today_entity": "Höchstpreis heute"
+        }
+      },
+      "pv": {
+        "title": "PV und Netz",
+        "description": "Bei den Prognosefeldern die Sensoren beider Anlagen auswählen; sie werden summiert. Beim Netzzähler alle Phasen auswählen.",
+        "data": {
+          "pv_remaining_today_entities": "PV-Prognose Rest heute",
+          "pv_tomorrow_entities": "PV-Prognose morgen",
+          "pv_power_entity": "PV-Erzeugung jetzt",
+          "grid_power_entities": "Netzleistung (negativ = Einspeisung)",
+          "house_power_entity": "Hausverbrauch"
+        }
+      },
+      "speicher": {
         "title": "Speicher und Grenzwerte",
+        "description": "Der Ladestand ist optional. Fehlt er, arbeitet die Logik eingeschränkt weiter und meldet das.",
         "data": {
           "battery_soc_entity": "Ladestand des Speichers",
           "battery_capacity_kwh": "Nutzbare Kapazität",
@@ -78,6 +112,17 @@
           "surplus_threshold_w": "Schwelle für PV-Überschuss",
           "pv_reserve_enabled": "Ladekapazität für PV-Überschuss freihalten",
           "pv_reserve_threshold_kwh": "Ab dieser PV-Prognose Kapazität freihalten"
+        }
+      },
+      "lasten": {
+        "title": "Großverbraucher und KI",
+        "description": "Hier wird festgelegt, welche ai_task-Entity die Integration befragen darf. Ein- und ausschalten lässt sich die KI danach jederzeit über den Schalter 'KI-Entscheidung nutzen'.",
+        "data": {
+          "dhw_planned_start_entity": "Angekündigter Start der Warmwasserbereitung",
+          "dhw_energy_kwh": "Energiebedarf je Warmwasser-Ladung",
+          "load_power_entities": "Leistungsmesser weiterer Großverbraucher",
+          "ai_enabled": "KI beim nächsten Neustart aktiviert starten",
+          "ai_task_entity": "ai_task-Entity"
         }
       }
     }
@@ -115,6 +160,9 @@
       "laden_empfohlen": { "name": "Laden empfohlen" },
       "guenstiges_fenster_aktiv": { "name": "Günstiges Fenster aktiv" },
       "datenbasis_unvollstaendig": { "name": "Datenbasis unvollständig" }
+    },
+    "switch": {
+      "ki_entscheidung_nutzen": { "name": "KI-Entscheidung nutzen" }
     }
   }
 }

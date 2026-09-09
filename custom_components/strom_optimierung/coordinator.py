@@ -105,6 +105,10 @@ class StromOptimierungCoordinator(DataUpdateCoordinator[Decision]):
         self.last_input: OptimizerInput | None = None
         # Neueste Entscheidung zuerst.
         self.history: deque[DecisionRecord] = deque(maxlen=MAX_HISTORY)
+        # Laufzeitschalter für den KI-Pfad. Der Wert aus dem Dialog ist nur
+        # der Startwert; danach steuert ihn `switch.*_ki_entscheidung_nutzen`,
+        # damit ein Umschalten die Integration nicht jedes Mal neu lädt.
+        self.ai_enabled: bool = bool(self._option(CONF_AI_ENABLED, False))
 
     # --- Zugriff auf Zustände ---------------------------------------------
 
@@ -292,7 +296,7 @@ class StromOptimierungCoordinator(DataUpdateCoordinator[Decision]):
         self.last_input = data
         decision = decide(data)
 
-        if self._option(CONF_AI_ENABLED, False) and self._option(CONF_AI_TASK_ENTITY):
+        if self.ai_enabled and self._option(CONF_AI_TASK_ENTITY):
             decision = await self.advisor.refine(data, decision)
 
         self._record(decision, data.now)

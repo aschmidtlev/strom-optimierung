@@ -250,6 +250,36 @@ views:
           - entity: binary_sensor.strom_optimierung_laden_empfohlen
             name: Laden empfohlen
 
+      - type: entities
+        title: KI-Pfad
+        # Der einzige bedienbare Schalter des Dashboards. Er wirkt nur
+        # innerhalb der Integration und sendet keinen Befehl an ein Geraet.
+        state_color: true
+        entities:
+          - entity: switch.strom_optimierung_ki_entscheidung_nutzen
+            name: KI-Entscheidung nutzen
+          - type: attribute
+            entity: switch.strom_optimierung_ki_entscheidung_nutzen
+            attribute: ai_task_entity
+            name: Befragte ai_task-Entity
+          - entity: sensor.strom_optimierung_entscheidungsquelle
+            name: Zuletzt verwendet
+
+      - type: conditional
+        conditions:
+          - entity: sensor.strom_optimierung_entscheidungsquelle
+            state: ai_fallback
+        card:
+          type: markdown
+          content: >-
+            **Die KI wurde befragt, hat aber nicht verwertbar geantwortet.**
+
+            Es gilt die regelbasierte Entscheidung. Moegliche Ursachen: die
+            ai_task-Entity ist nicht erreichbar, es fehlt ein API-Schluessel,
+            oder die Antwort war unplausibel und wurde verworfen. Das
+            Home-Assistant-Protokoll unter
+            `custom_components.strom_optimierung` nennt den Grund.
+
       - type: gauge
         title: Ziel-Ladestand
         entity: sensor.strom_optimierung_ziel_ladestand
