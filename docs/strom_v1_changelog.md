@@ -1,5 +1,25 @@
 # strom_v1 – Änderungsprotokoll
 
+## 0.1.3 – 09.09.2026
+
+Reine Dokumentationsversion. **Am Integrationscode ändert sich nichts** – wer
+0.1.2 installiert hat, gewinnt durch das Update funktional nichts.
+
+- `strom_v1_open_questions.md` erklärt unter **B8**, warum diese Integration
+  keine Nulleinspeisungs- beziehungsweise Eigenverbrauchsregelung leistet und
+  auch nicht leisten soll: das ist eine Regelungsaufgabe im Sekundentakt und
+  gehört in den Speicher, während diese Integration im Minutentakt plant.
+- Dort ebenfalls festgehalten sind die beiden Folgen daraus, die man kennen
+  muss: sobald der Speicher den Eigenverbrauch selbst regelt, erreicht kein
+  Überschuss mehr den Zähler – die PV-Überschusserkennung wird damit blind
+  und `charge_pv` löst nicht mehr aus. Und „Vorladen in Niedrigpreisphasen"
+  erzeugt bewusst Netzbezug, steht also im Zielkonflikt zu „Netzbezug gegen
+  null".
+- **C1** hält fest, dass eine spätere Aktorebene eine zeitlich begrenzte
+  Übersteuerung werden soll, keine Regelung: Eigenverbrauch als
+  Normalzustand, erzwungenes Netzladen nur im günstigen Fenster, danach
+  zurück.
+
 ## 0.1.2 – 09.09.2026
 
 Der KI-Pfad war nach der Einrichtung nicht mehr erreichbar.
